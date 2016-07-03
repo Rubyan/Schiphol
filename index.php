@@ -8,7 +8,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Symfony\Component\DomCrawler\Crawler;
 
-$apikey = "your-prowl-api-key-here";
+//$apikey = "your-prowl-api-key-here";
 
 //$date = "2016-07-03%2010:30:00";
 //$params = "?date=" . $date;
@@ -36,6 +36,14 @@ foreach ($runways as $runway) {
 	$x = $crawler->filter("#" . $runway);
 	$state[$runway] = $x->attr('class');
 }
+
+// log states. append or create file
+$filename = date('Y-m-d') . ".log";
+//echo $filename;
+file_put_contents($filename, json_encode($state) . "\r\n", FILE_APPEND | LOCK_EX);
+//file_put_contents($filename, json_encode($state));
+//file_put_contents($filename, "test", FILE_APPEND);
+
 $previous_state = (array)json_decode(file_get_contents("state.json"));
 
 echo "Vorige start- en landingsbanen in Schiphol:\n";
@@ -60,14 +68,19 @@ foreach ($runways as $runway) {
 
 if ($changes != "") {
 	echo $changes;
-	
-    $p = new Prowl\Prowl();
-    $p->setApplication('Schiphol');
-    $p->setKey($apikey);
-    $p->setFailOnNotAuthorized(false);
-    $p->setSubject("Verandering in start/landingsbaan op Schiphol");
-    $p->setMessage($changes);
-    $p->push();
+	if (isset($apikey)) {
+		$p = new Prowl\Prowl();
+		$p->setApplication('Schiphol');
+		$p->setKey($apikey);
+		$p->setFailOnNotAuthorized(false);
+		$p->setSubject("Verandering in start/landingsbaan op Schiphol");
+		$p->setMessage($changes);
+		$p->push();
+	}
 } else {
 	echo "Er zijn geen veranderingen\n";
 }
+
+
+
+
