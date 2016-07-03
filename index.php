@@ -39,10 +39,7 @@ foreach ($runways as $runway) {
 
 // log states. append or create file
 $filename = date('Y-m-d') . ".log";
-//echo $filename;
 file_put_contents($filename, json_encode($state) . "\r\n", FILE_APPEND | LOCK_EX);
-//file_put_contents($filename, json_encode($state));
-//file_put_contents($filename, "test", FILE_APPEND);
 
 $previous_state = (array)json_decode(file_get_contents("state.json"));
 
